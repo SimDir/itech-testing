@@ -1,0 +1,86 @@
+
+<div class="container" id="ReportApp">
+    <form @submit.prevent="FormSubmt">
+        <div class="mb-3">
+            <label for="InputName" class="form-label">Имя</label>
+            <input type="text" class="form-control" id="InputName" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputLastName" class="form-label">Фамилия</label>
+            <input type="text" class="form-control" id="InputLastName" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputEmail1" class="form-label">E-mail для уведомлений</label>
+            <input type="email" class="form-control" id="InputEmail1" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputPhone" class="form-label">Телефон для уведомлений</label>
+            <input type="tel" pattern="(\+?\d[- .]*){7,13}" class="form-control" id="InputPhone" required>
+        </div>
+        <div class="mb-3">
+            <label for="InputCompany" class="form-label">Подразделение</label>
+            <input type="text" class="form-control" id="InputCompany" required>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input v-model="addoptoin" type="checkbox" class="form-check-input" id="Check1">
+            <label class="form-check-label" for="Check1">Хочу быть докладчиком</label>
+        </div>
+
+        <div v-if="addoptoin" class="mb-3">
+            <label for="InputReportThems" class="form-label">Тема доклада</label>
+            <input type="text" class="form-control" id="InputReportThems" required>
+        </div> 
+        <div v-if="addoptoin" class="form-floating mb-3">
+            <label for="floatingTextarea">Краткое описание доклада</label>
+            <textarea class="form-control" id="floatingTextarea" style="height: 150px" required></textarea>
+
+        </div>
+        <button type="submit" class="btn btn-primary">Регистрация</button>
+    </form>
+</div>
+<script>
+    const ReportApp = {
+        data() {
+            return {
+                ReportForm: {
+                    email: '', phone: '', lastname: '', name: ''
+                },
+                errorMsg: '',
+                addoptoin: false
+            };
+        },
+        watch: {
+            state(newstate) {
+                if (newstate === 1) {
+
+                }
+            }
+        },
+        methods: {
+            FormSubmt() {
+                var apiParam = {
+                    data: this.ReportForm
+                };
+                fetch('/report/joint/api', {
+                    mode: 'cors',
+                    method: 'POST',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    body: JSON.stringify(apiParam)
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.hasOwnProperty('error')) {
+                        this.errorMsg = res.error;
+                    }
+                    console.log(res);
+                });
+            }
+        }
+    };
+
+    Vue.createApp(ReportApp).mount('#ReportApp');
+
+
+</script>

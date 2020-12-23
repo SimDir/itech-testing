@@ -1,0 +1,17 @@
+AddDefaultCharset utf-8
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteRule ^css/(.*)$ ./public/css/$1 [NC,L]
+RewriteRule ^js/(.*)$ ./public/js/$1 [NC,L]
+RewriteRule ^font/(.*)$ ./public/font/$1 [NC,L]
+RewriteRule ^img/(.*)$ ./public/img/$1 [NC,L]
+
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+
+
+</IfModule>
+

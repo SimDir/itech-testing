@@ -1,0 +1,9 @@
+{
+    "name": "simdir/itech-testing",
+    "require": {
+        "filp/whoops": "^2.9",
+        "monolog/monolog": "^2.2",
+        "gabordemooij/redbean": "^5.6",
+        "symfony/var-dumper": "^5.2"
+    }
+}
