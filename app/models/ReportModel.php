@@ -12,18 +12,17 @@ defined('ROOT') OR die('No direct script access.');
 class ReportModel extends Model {
 
 
-    public function GetAll($Data = null) {
+    public function GetAllReport($Data = null) {
 
         $tempbean = $this->getAll('SELECT name,title,createdatetime,type FROM ' .$this->TableName . ' ORDER BY createdatetime' );
         
 //        dd($tempbean);
         if ($tempbean) {
             return $tempbean;//$this->exportAll($tempbean, TRUE);
-
         }
         return FALSE;
     }
-    public function Add($Data = null) {
+    public function AddReport($Data = null) {
         if (is_null($Data))
             return false;
         $Table = $this->Dispense($this->TableName);
@@ -32,13 +31,13 @@ class ReportModel extends Model {
         $Table->editdatetime = date('Y-m-d H:i:s');
         return $this->store($Table);
     }
-    public function Del($id = null) {
+    public function DelReport($id = null) {
         if (is_null($id))
             return false;
         $Page = $this->load($this->TableName, $id);
         return $this->trash($Page);
     }
-    public function Edit($Data = null, $id) {
+    public function EditReport($Data = null, $id=null) {
         if (is_null($Data))
             return false;
 //        $Table = $this->Dispense($this->TableName);
@@ -48,7 +47,7 @@ class ReportModel extends Model {
         return $this->store($Table);
     }
 
-    public function GetByName($name = '') {
+    public function GetReportByName($name = '') {
         $Ret = $this->findOne($this->TableName, '(name = :name)', [':name' => $name]);
         if ($Ret) {
             return $Ret->export();
