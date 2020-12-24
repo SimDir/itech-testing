@@ -140,7 +140,7 @@ final class core {
             if (SHOW_ERROR) {
                 return "<h1>405 Method Not Allowed</h1>" . __METHOD__ . "<h5> Контроллер <b style=\"color: red;\">" . $Controller . "</b> Не имеет метода <b style=\"color: red;\">$Action()</b></h5>";
             } else {
-                return '';
+                return '<h1>404 Страница не найдена</h1>';
             }
         }
         if (!headers_sent()) {
@@ -150,7 +150,7 @@ final class core {
         if (SHOW_ERROR) {
             return "<h1>523 Origin Is Unreachable</h1>" . __METHOD__ . "<h5> Нет исполнительного контроллера <b style=\"color: red;\">$Controller</b></h5>";
         } else {
-            return '';
+            return '<h1>404 Страница не найдена</h1>';
         }
     }
 

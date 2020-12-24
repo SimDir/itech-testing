@@ -39,7 +39,7 @@ define('TEMPLATE_DIR', SITE_DIR . 'public' . DS.'Templates'.DS);
 
 define('CONFIG_DIR', APP . 'config' . DS); // папка с конфигами
 
-define ('SHOW_ERROR', true); // Показывать ошибки контроллеров или перенаправлять на 404 страницу? https://natribu.org/ru/
+define ('SHOW_ERROR', false); // Показывать ошибки контроллеров или перенаправлять на 404 страницу? https://natribu.org/ru/
 define ('ERROR_URL', '/');
 define ('COMPOSER', SITE_DIR.'vendor'.DS.'autoload.php');
 

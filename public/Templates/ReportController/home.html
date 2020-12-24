@@ -1,27 +1,65 @@
-<div class="d-flex justify-content-around mt-4">
-    <h1>Список докладов</h1>
-    <div>
-        <a class="btn btn-primary" href="/report/joint" role="button">Хочу учавствовать!</a>
+<div id="ReportListApp">
+    <div class="d-flex justify-content-around mt-4">
+        <h1>Список докладов</h1>
+        <div>
+            <a class="btn btn-primary" href="/report/joint" role="button">Хочу учавствовать!</a>
+        </div>
     </div>
+
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Докладчик</th>
+                <th scope="col">Тема доклада</th>
+                <th scope="col">Подразделение</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="value in ReportData">
+                <td>{{value.name}} {{value.lastname}}</td>
+                <td><a :href="'/report/'+value.alias+'.html'">{{value.thems}}</a></td>
+                <td>{{value.company}}</td>
+            </tr>
+
+        </tbody>
+    </table>
 </div>
 
+<script>
+    const ReportListApp = {
+        data() {
+            return {
+                ReportData:[],
+                errorMsg: '', msg: ''
+            };
+        },
+        created(){
+            fetch('/report/get/api', {
+                mode: 'cors',
+                method: 'POST',
+                cache: 'no-cache',
+                credentials: 'same-origin'
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.hasOwnProperty('error')) {
+                    this.errorMsg = res.error;
+                    return;
+                }
+                this.ReportData=res;
+               console.log(res);
+            });
+        },
+        methods: {
+            Form() {
+
+            }
+        }
+    };
+
+    Vue.createApp(ReportListApp).mount('#ReportListApp');
 
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">ФИО Докладчик</th>
-            <th scope="col">Подразделение</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Марк Цукерберг</td>
-            <td>ФСБук</td>
-        </tr>
-        <tr>
-            <td>Павел Дуров</td>
-            <td>Втелеграм</td>
-        </tr>
-    </tbody>
-</table>
+</script>

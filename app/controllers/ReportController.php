@@ -12,8 +12,18 @@ class ReportController extends Controller {
     }
 
     public function GetAction($ReportName = null) {
+        if ($ReportName === 'api') {
+            return $this->GetReportList();
+        }
 
+        $Report = new ReportModel();
+        $ReportData = $Report->GetReportByName($ReportName);
+        if(!$ReportData){
+            return '<h1>Доклад не найден</h1>';
+        }
+        $this->View->VarSetArray($ReportData);
         return $this->View->Render('report.html');
+        
     }
 
     public function JointAction($param = null) {
@@ -21,6 +31,11 @@ class ReportController extends Controller {
             return $this->AddReport();
         }
         return $this->View->Render('newreport.html');
+    }
+
+    private function GetReportList() {
+        $Report = new ReportModel();
+        return $Report->GetAllReport();
     }
 
     private function AddReport() {
@@ -58,12 +73,12 @@ class ReportController extends Controller {
         if (!isset($data['reportThems']) and $data['reportThems'] !== '') {
             return ['error' => 'Не указано тема доклада в формы заявки'];
         }
-        $ReportData['reportThems'] = strip_tags($data['reportThems']);
-
+        $ReportData['thems'] = strip_tags($data['reportThems']);
+        $ReportData['alias'] = $this->ThemsTranslitToUrl($ReportData['thems']);
         if (!isset($data['reportShortDescriptions']) and $data['reportShortDescriptions'] !== '') {
             return ['error' => 'Не указано краткое описание в формы заявки'];
         }
-        $ReportData['reportShortDescriptions'] = htmlspecialchars($data['reportShortDescriptions']); // если надо показать код в описании доклада. но не исполнять сам код
+        $ReportData['descriptions'] = htmlspecialchars($data['reportShortDescriptions']); // если надо показать код в описании доклада. но не исполнять сам код
 
         if (!isset($data['reporter'])) {
             return ['error' => 'Не указан докладчик вы или слушатель в формы заявки'];
@@ -80,11 +95,11 @@ class ReportController extends Controller {
         if (!$WebHookRet) {
             return ['error' => 'не удалось добавить лид в битрикс24'];
         }
-        return ['success'=>true, 'Model_return_param' => $mdlRet, 'Web_hook_return_param' => $WebHookRet];
+        return ['success' => true, 'Model_return_param' => $mdlRet, 'Web_hook_return_param' => $WebHookRet];
     }
 
     private function WebHookB24($PostData) {
-        return true;
+        return true; // заглушка чтобы не создавать литы во время тестирования
         $queryUrl = 'https://itech-testing.bitrix24.ru/rest/1/7weijsnqhivdav32/crm.lead.add.json';
 
         if ($PostData['reporter']) {
@@ -114,6 +129,13 @@ class ReportController extends Controller {
         $result = curl_exec($curl);
         curl_close($curl);
         return $result;
+    }
+
+    private function ThemsTranslitToUrl($strs) {
+        $str = trim($strs, "  \n\r\t\v\0");
+        $rus = array(' ', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я');
+        $lat = array('-', 'A', 'B', 'V', 'G', 'D', 'E', 'E', 'Gh', 'Z', 'I', 'Y', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'C', 'Ch', 'Sh', 'Sch', 'Y', 'Y', 'Y', 'E', 'Yu', 'Ya', 'a', 'b', 'v', 'g', 'd', 'e', 'e', 'gh', 'z', 'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', 'ch', 'sh', 'sch', 'y', 'y', 'y', 'e', 'yu', 'ya');
+        return str_replace($rus, $lat, $str);
     }
 
 }
