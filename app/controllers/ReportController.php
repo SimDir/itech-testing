@@ -91,46 +91,40 @@ class ReportController extends Controller {
         if (!$mdlRet) {
             return ['error' => 'не удалось добавить заявку базу данных'];
         }
-        $WebHookRet = $this->WebHookB24($ReportData);
+        if ($ReportData['reporter']) {
+            $reportThems = $PostData['reportThems'];
+        } else {
+            $reportThems = 'Не является докладчиком';
+        }
+        // значения добавил по хардкору. по идеи все это надо выносить либо в фаил конфигов а лучше в админ раздел приложения чтоб можно менять эти параметры через админку сайта.
+        $b24 = new \Fomvasss\Bitrix24ApiHook\Bitrix24('https://itech-testing.bitrix24.ru', 1, '7weijsnqhivdav32');
+        // see "crm.lead.add"
+        $WebHookRet = $b24->crmLeadAdd([
+            "fields" => [
+                'TITLE' => 'Заявка от ' . $ReportData['name'] . ' ' . $ReportData['lastname'],
+                'NAME' => $ReportData['name'],
+                "LAST_NAME" => $ReportData['lastname'],
+                "STATUS_ID" => "NEW",
+                "OPENED" => "Y",
+                "COMPANY_TITLE" => $ReportData['company'],
+                "COMMENTS" => $reportThems,
+                'EMAIL' => [
+                    ["VALUE" => $ReportData['email'], "VALUE_TYPE" => "WORK" ],
+                ],
+                'PHONE' => [
+                    ['VALUE' => $ReportData['phone'],'VALUE_TYPE' => 'WORK']
+                ]
+            ],
+            'params' => ["REGISTER_SONET_EVENT" => "Y"],
+        ]);
+        
+        
         if (!$WebHookRet) {
             return ['error' => 'не удалось добавить лид в битрикс24'];
         }
         return ['success' => true, 'Model_return_param' => $mdlRet, 'Web_hook_return_param' => $WebHookRet];
     }
-
-    private function WebHookB24($PostData) {
-        return true; // заглушка чтобы не создавать литы во время тестирования
-        $queryUrl = 'https://itech-testing.bitrix24.ru/rest/1/7weijsnqhivdav32/crm.lead.add.json';
-
-        if ($PostData['reporter']) {
-            $reportThems = $PostData['reportThems'];
-        } else {
-            $reportThems = 'Не является докладчиком';
-        }
-
-        $queryData = http_build_query(array('fields' => array(
-                "TITLE" => 'Заявка от ' . $PostData['name'] . ' ' . $PostData['lastname'],
-                "NAME" => $PostData['name'],
-                "LAST_NAME" => $PostData['lastname'],
-                "STATUS_ID" => "NEW",
-                "OPENED" => "Y",
-//                "ASSIGNED_BY_ID" => 1,
-//                "CREATED_BY_ID" => 255,
-                "COMPANY_TITLE" => $PostData['company'],
-                "COMMENTS" => $reportThems,
-                "SOURCE_DESCRIPTION" => "CRM-форма",
-                "PHONE" => array(array("VALUE" => $PostData['phone'], "VALUE_TYPE" => "WORK")),
-                "EMAIL" => array(array("VALUE" => $PostData['email'], "VALUE_TYPE" => "WORK")),
-            ),
-            'params' => array("REGISTER_SONET_EVENT" => "Y")));
-
-        $curl = curl_init();
-        curl_setopt_array($curl, array(CURLOPT_SSL_VERIFYPEER => 0, CURLOPT_POST => 1, CURLOPT_HEADER => 0, CURLOPT_RETURNTRANSFER => 1, CURLOPT_URL => $queryUrl, CURLOPT_POSTFIELDS => $queryData,));
-        $result = curl_exec($curl);
-        curl_close($curl);
-        return $result;
-    }
-
+    // для ЧПУ адреса незахотел использовать русский текст. хотя у кирилица работать будет в адресной строке браузера
     private function ThemsTranslitToUrl($strs) {
         $str = trim($strs, "  \n\r\t\v\0");
         $rus = array(' ', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я');
