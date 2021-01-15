@@ -275,7 +275,7 @@ final class core {
         date_default_timezone_set(TIMEZONE);
 
         if (!file_exists(self::$globalConfig['App_Config_Dir'] . 'AutoLoader.php')) {
-            self::$globalConfig['App_Clas_Loader_Dir_Array'] = ['classes', 'models', 'controllers'];
+            self::$globalConfig['App_Clas_Loader_Dir_Array'] = ['classes', 'models', 'controllers','helpers'];
         } else {
             self::$globalConfig['App_Clas_Loader_Dir_Array'] = include_once self::$globalConfig['App_Config_Dir'] . 'AutoLoader.php';
         }
